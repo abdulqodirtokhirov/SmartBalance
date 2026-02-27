@@ -647,3 +647,37 @@ def main():
 
 if __name__ == "__main__":
     main()
+import os
+from aiohttp import web
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+
+# ... (коднинг қолган қисми) ...
+
+# Webhook созламалари
+WEBHOOK_HOST = os.environ.get("WEBHOOK_HOST")
+WEBHOOK_PATH = f'/{BOT_TOKEN}'
+WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
+PORT = int(os.environ.get("PORT", 8080))
+
+async def on_startup(bot):
+    await bot.set_webhook(WEBHOOK_URL)
+
+async def on_shutdown(bot):
+    await bot.delete_webhook()
+
+if __name__ == '__main__':
+    # Webhook ишлатиш
+    app = web.Application()
+    
+    # SimpleRequestHandler орқали сўровларни қайта ишлаш
+    dispatcher = dp
+    webhook_requests_handler = SimpleRequestHandler(
+        dispatcher=dispatcher,
+        bot=bot,
+    )
+    webhook_requests_handler.register(app, path=WEBHOOK_PATH)
+    
+    setup_application(app, dispatcher, bot=bot)
+    
+    # Иловани портда ишга тушириш
+    web.run_app(app, port=PORT)
