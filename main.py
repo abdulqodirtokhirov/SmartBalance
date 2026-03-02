@@ -4,6 +4,8 @@ import asyncio
 import logging
 import re
 import aiohttp
+import os
+from aiohttp import web
 from datetime import datetime
 from typing import Dict, Any
 
@@ -1315,6 +1317,21 @@ async def process_set_main_currency(callback: CallbackQuery, state: FSMContext):
 
 # ===================== MAIN =====================
 
+async def handle(request):
+    return web.Response(text="Bot is running!")
+
+async def start_server():
+    app = web.Application()
+    app.router.add_get("/", handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    # Render томонидан бериладиган портни оламиз
+    port = int(os.environ.get("PORT", 8080)) 
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    logger.info(f"Web server started on port {port}")
+
+    
 async def main():
     """Main function to start the bot."""
     logger.info("Starting bot...")
@@ -1324,6 +1341,9 @@ async def main():
     
     # Fetch exchange rates
     await get_exchange_rates()
+
+    # Вэб-серверни алоҳида вазифа сифатида ишга туширамиз
+    asyncio.create_task(start_server()) # <--- Шу қаторни қўшинг
     
     # Start polling
     await dp.start_polling(bot)
