@@ -23,7 +23,8 @@ from strings import get_text, get_utility_name, UTILITY_TYPES
 
 # ===================== CONFIGURATION =====================
 
-BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
+import os 
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 # Exchange rates (fallback values, updated from API)
 EXCHANGE_RATES = {
